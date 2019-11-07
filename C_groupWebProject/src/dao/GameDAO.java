@@ -28,11 +28,42 @@ import model.GameBeans;
  */
 public class GameDAO extends ConstantDefinition{
 
-	public boolean getAccount(AccountBeans beans){
+	public void postData(AccountBeans account, GameBeans data){
 
-		List<AccountBeans> dataList = new ArrayList<>();
+		System.out.println(account.getName());
+		System.out.println(data.getGame());
 
-		boolean check = false;	// 入力されたアカウント情報のチェック用
+		//クラスをロード
+		try {
+			Class.forName("org.postgresql.Driver");
+			}catch(ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+
+		//データベース接続
+		try(Connection con = DriverManager.getConnection(GAME_URL,DRIVER_USER,DRIVER_PASS)){
+
+			// DBにアカウントを登録する
+			String sqladd =
+				"INSERT INTO gamerecord VALUES('"+ account.getName() +"', '"+data.getGame() +"', '"+ data.getYear() + "', '"+ data.getMonth() + "', '"+ data.getDay() + "', '"+ data.getHour() + "', '"+ data.getMinute() + "', '"+ data.getSecond() + "', '"+ data.getScore() + "')";
+			PreparedStatement pStmt2 = con.prepareStatement(sqladd);
+
+			//INSERTを実行
+			pStmt2.executeUpdate();
+
+		}catch(SQLException e) {
+
+			e.printStackTrace();
+
+		}
+	}
+
+
+
+	@SuppressWarnings("unused")
+	private void hoge() {
+
+		List<GameBeans> dataList = new ArrayList<>();
 
 		//クラスをロード
 		try {
@@ -45,7 +76,7 @@ public class GameDAO extends ConstantDefinition{
 		try(Connection con = DriverManager.getConnection(ACCOUNT_URL,DRIVER_USER,DRIVER_PASS)){
 
 			//SELECT文の準備
-			String sql = "SELECT NAME, GAME, YEAR, MONTH, DAY, HOUR, MINITE, SECOND, SCORE, FROM GameRecord";
+			String sql = "SELECT NAME, GAME, YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, SCORE, FROM GameRecord";
 			PreparedStatement pStmt = con.prepareStatement(sql);
 
 			//SELECTを実行
@@ -55,41 +86,24 @@ public class GameDAO extends ConstantDefinition{
 			while(rs.next()) {
 
 				// Beansを用いてコレクションを作成
-				GameBeans game = new GameBeans();
-				game.setGame(rs.getString("GAME"));
-				game.setYear(rs.getString("YEAR"));
-				game.setMonth(rs.getString("MONTH"));
-				game.setDay(rs.getString("DAY"));
-				game.setHour(rs.getString("HOUR"));
-				game.setMinite(rs.getString("MINITE"));
-				game.setSecond(rs.getString("SECOND"));
-				game.setScore(rs.getString("SCORE"));
+				GameBeans data = new GameBeans();
+				data.setGame(rs.getString("GAME"));
+				data.setYear(rs.getString("YEAR"));
+				data.setMonth(rs.getString("MONTH"));
+				data.setDay(rs.getString("DAY"));
+				data.setHour(rs.getString("HOUR"));
+				data.setMinute(rs.getString("MINUTE"));
+				data.setSecond(rs.getString("SECOND"));
+				data.setScore(rs.getString("SCORE"));
 
-				dataList.add(game);
+				dataList.add(data);
 
 			}
-
-			/* ADD for @author 近藤 */
-			for (int index = 0 ; index < dataList.size(); index++)
-			{	// 入力されたユーザ名と一致するものを探す
-
-				if (dataList.get(index).getName().equals(beans.getName())
-					&&dataList.get(index).getPass().equals(beans.getPass()))
-				{	// ユーザ名パスワードが一致すればログイン成功
-
-					check = true;
-					break;
-
-				}	// if end
-			}	// for end
 
 		}catch(SQLException e) {
 
 			e.printStackTrace();
-			return false;
 
 		}
-
-		return check;
 	}
 }
