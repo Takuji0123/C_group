@@ -27,10 +27,8 @@
 	-->
 	</style>
 </head>
-
 <body>
 	<jsp:include page="/HEADER.jsp"/>
-
 	<div class="msgBox">
 		<p>
 			<%= account.getName() %>さんのログアウト処理が<br>
@@ -38,20 +36,15 @@
 		</p>
 		<p id="returnTimer" style="font-size: 15px;">/returnTimer/</p>
 	</div>
-
 	<% session.removeAttribute("accountBeans"); %>
-
 	<script>
 	(function(){
-		let reText = document.getElementById("returnTimer"),
-			countSec = 3;
-
+		let countSec = 3,
+			reText = document.getElementById("returnTimer");
 		// 3秒後にTOPページへ移動
 		const timer = () => {
-
 			// カウントダウンテキストの表示
 			reText.textContent = countSec +"秒後にTOPへ移動します。";
-
 			if (countSec != 0)
 			{
 				countSec--;
@@ -59,10 +52,8 @@
 			} else
 			{ location.href = "index.jsp"; }
 		};
-
 		timer();
 	})();
 	</script>
 </body>
-
 </html>
