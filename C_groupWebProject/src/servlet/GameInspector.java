@@ -33,18 +33,19 @@ public class GameInspector extends HttpServlet {
 		HttpSession session = request.getSession();
 		AccountBeans account = null;
 
+		String url = request.getParameter("url");
+
 		try {
 
 			account = (AccountBeans) session.getAttribute("accountBeans");
 			account.getName();
 
 		}catch(NullPointerException ex) {
-			return;
+			response.sendRedirect(url);
 		}
 
 		String game = request.getParameter("game");
 		String score = request.getParameter("score");
-
 
 		/*プレイ日時としてリアルタイム取得。*/
 
@@ -73,6 +74,7 @@ public class GameInspector extends HttpServlet {
 		GameDAO gameDAO = new GameDAO();
 		gameDAO.postData(account,data);
 
+		response.sendRedirect(url);
 	}
 
 }
