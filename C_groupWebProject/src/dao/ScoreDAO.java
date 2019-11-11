@@ -40,10 +40,20 @@ extends ConstantDefinition
 		//データベース接続
 		try(Connection con = DriverManager.getConnection(ACCOUNT_URL,DRIVER_USER,DRIVER_PASS)){
 
-			//TODO VIEWの準備、実行
+			//TODO VIEWの準備
+			String viewSQL = "CREATE VIEW ScoreRanking (name, game, score, year, month, day)\n" +
+					"			AS\n" +
+					"			SELECT name, game, score, year, month, day	\n" +
+					"				FROM GameRecord";
+
+			//TODO VIEWの実行 (セレクト文の実行呼び出し、scoreBeans(リスト)へ保存)
+
+
 
 			//SELECT文の準備
-			String selectSQL = "#";	//TODO SELECT文の作成
+			String selectSQL = "SELECT name, game, MAX(score) AS maxScore\n" +
+					"FROM ScoreRanking\n" +
+					"GROUP BY name, game";	//TODO SELECT文の作成
 			PreparedStatement stateSELECT = con.prepareStatement(selectSQL);
 
 			//SELECTを実行
