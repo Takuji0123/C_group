@@ -18,6 +18,7 @@
 		font-size: 1em;
 		font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", "sans-serif";
 		}
+
 		.webCommon_Header {
 		background-color: aqua;
 		position: absolute;
@@ -27,6 +28,7 @@
 		height: 150px;
 		z-index: 100;
 		}
+
 		.webCommon_Header > h1 {
 			position:absolute;
 			left: 50px;
@@ -34,6 +36,7 @@
 			text-align: left;
 			font-size: 30pt;
 		}
+
 		.webCommon_Header > h2 {
 			position:absolute;
 			top: 10px;
@@ -41,6 +44,7 @@
 			text-align: right;
 			font-size: 15pt;
 		}
+
 		.webCommon_Header > .button {
 			position:absolute;
 			top: 100px;
@@ -48,6 +52,7 @@
 			height: 50px;
 			z-index: 101;
 		}
+
 		.webCommon_Header > .button > .btn-border {
 			display: inline-block;
 			width: 120px;
@@ -63,59 +68,73 @@
 			border-radius: 4px;
 			transition: .4s;
 		}
+
 		.webCommon_Header > .button > .btn-border:hover {
 			background-color: #9ec34b;
 			border-color: #cbe585;
 			color: #FFF;
 		}
+
 		.webCommon_Header > .button > .hidden {
 			display: none;
 		}
 	-->
 	</style>
 </head>
+
 <body>
 	<%
 	String name;
 	boolean check;
+
 	if (account == null)
 	{
+
 		check = false;
 		name = "ゲスト";
+
 	}
 	else
 	{
+
 		check = true;
 		name = account.getName();
+
 	}
 	%>
 	<div class="webCommon_Header">
 		<h1>ヘッドテキスト</h1>
 		<h2>ようこそ<%= name %>さん！</h2>
 		<div class="button">
-			<a href="index.jsp" class="btn-border">HOME</a>
-			<a href="mypage.jsp" class="btn-border">MY PAGE</a>
-			<a href="ranking.jsp" class="btn-border">RANKING</a>
-			<a href="login.jsp" class="btn-border" id="webCommon_login">LOGIN</a>
-			<a href="logout.jsp" class="btn-border hidden" id="webCommon_logout">LOGOUT</a>
+			<a href="/C_groupWebProject/index.jsp" class="btn-border">HOME</a>
+			<a href="/C_groupWebProject/mypage.jsp" class="btn-border">MY PAGE</a>
+			<a href="/C_groupWebProject/ranking.jsp" class="btn-border">RANKING</a>
+			<a href="/C_groupWebProject/login.jsp" class="btn-border" id="webCommon_login">LOGIN</a>
+			<a href="/C_groupWebProject/logout.jsp" class="btn-border hidden" id="webCommon_logout">LOGOUT</a>
 		</div>
 	</div>
+
 	<script>
 		(function() {
+
 			const login = document.getElementById("webCommon_login"),
 				  logout = document.getElementById("webCommon_logout");
+
 			if (<%= check %>)
 			{	// ログインしていればLOGOUTボタンを表示
-				console.log("accountUN_NULL");
+
 				document.getElementsByClassName('hidden')[0].classList.remove('hidden');
 				login.classList.add('hidden');
+
 			} else
 			{	// ログインしていなければLOGINボタンを表示
-				console.log("accountNULL");
+
 				document.getElementsByClassName('hidden')[0].classList.remove('hidden');
 				logout.classList.add('hidden');
+
 			}
 		})();
 	</script>
 </body>
+
 </html>

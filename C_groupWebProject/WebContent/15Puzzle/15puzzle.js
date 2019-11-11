@@ -11,12 +11,16 @@
 'use strict';
 {
 
+	// ゲームの進行状況
+	let result = false,
+		points;
+
 	// レベル選択ボタンの要素を取得
-	const level = [
+	const levels = [
 		document.getElementById("startButton1"),
 		document.getElementById("startButton2"),
 		document.getElementById("startButton3")
-		];
+	];
 
 	// 表示するテキスト要素を取得
 	const gameText = {
@@ -25,19 +29,44 @@
 		count: document.getElementById("countText")
 	};
 
-	level.forEach((array, index) => {
+	// レベルボタンにイベントリスナーを設定
+	levels.forEach((array, index) => {
 		array.addEventListener("click", function(e) {
-			gameStart(index + 1);
+			startAnimation(index + 1);
 		});
 	});
 
+
+
+	function startAnimation(level)
+	{	// レベルが選択されたらアニメーションを流しゲームスタート
+
+		// ボタンオブジェクトを削除
+		let frontWindow = document.getElementById("frontWindow");
+		while (frontWindow.firstChild) frontWindow.removeChild(frontWindow.firstChild);
+
+		let startAnime = document.createElement("img");
+		startAnime.src = "15PuzzleTexture/StartAnime.gif";
+		frontWindow.appendChild(startAnime);
+
+		setTimeout(function() {
+
+			// アニメーション再生後にゲーム開始
+			while (frontWindow.firstChild) frontWindow.removeChild(frontWindow.firstChild);
+			frontWindow.remove();
+			gameStart(level);
+
+		}, 3000);
+	}
+
+
+
 	function gameStart(level)
-	{	// レベルの選択ボタンが押されたら実行
+	{	// ゲームのメイン処理
 
         let canvas = document.getElementById("stage"),
 			moveCount = level * (level + 7 + (level * (level - 1))),
 			clickCount = 0,
-			result = false,
         	context,
         	image,
         	tiles = new Array(4).fill(null).map(() => new Array(4).fill(null));
@@ -56,12 +85,6 @@
 			[-1,  0],
 			[ 1,  0]
 		];
-
-		// ボタンオブジェクトを削除
-		let element = document.getElementById("frontWindow");
-		while (element.firstChild)
-		{ element.removeChild(element.firstChild); }
-		element.remove();
 
 		if (!canvas.getContext)
 		{	// もしcanvasに対応していなければ
@@ -156,7 +179,7 @@
 			// 右下のタイルを-1とする
 			tiles[tiles[0].length - 1][tiles.length - 1] = -1;
 
-        }	// initTiles function end
+        }	// initTiles func end
 
 
 
@@ -202,7 +225,7 @@
 				{ covorNumber = targetPosition - 1; }
 
 			}	// while end
-		}	// moveBlank function end
+		}	// moveBlank func end
 
 
 
@@ -240,7 +263,7 @@
             if (checkResult())
             { getTime("gameClear"); }
 
-        }	// drawPuzzle function end
+        }	// drawPuzzle func end
 
 
 
@@ -263,7 +286,7 @@
 
 				}	// for end
 			}	// for end
-		}	// checkResult function end
+		}	// checkResult func end
 
 
 
@@ -290,7 +313,7 @@
 					return playTimeMsec;
 
 			}	// switch end
-		}	// getTime function end
+		}	// getTime func end
 
 
 
@@ -306,7 +329,7 @@
 					}, 1);
 
 			}	// if end
-		}	// showTimer function end
+		}	// showTimer func end
 
 
 
@@ -351,7 +374,7 @@
             console.log("じかんD"+ timeDeduction);
 
 			// 手数と経過時間により得点減少率を加算計算方式で合計し最大得点から減算する
-            let points = Math.round(levelPoints() * (1 - ((moveDeduction + timeDeduction) / 100)));
+            points = Math.round(levelPoints() * (1 - ((moveDeduction + timeDeduction) / 100)));
 
 			console.log(`Game Clear!\n\nプレイ時間:${sec}.${msec}秒\n移動回数:${clickCount}回\n得点:${points}`);
 
@@ -373,12 +396,26 @@
 			div.appendChild(img);
 			div.appendChild(text);
 
-			// ゲームのデータを送信
-			document.getElementById("gameName").value = "15Puzzle";
-			document.getElementById("gameScore").value = points;
-			document.querySelector("form").submit();
+			setTimeout(function() {
+				text.innerHTML += '<br><font size="3">画面をクリックしてね♪</font>';
 
-		}	// gameClear function end
-	}	// gameStart function end
+				document.querySelector("body")[0],addEventListener("click", function(e) {
+					submit("/C_groupWebProject/15Puzzle/15puzzleGameSite.html");
+				});
+			}, 1000);
 
+		}	// gameClear func end
+	}	// gameStart func end
+
+
+
+	function submit(url)
+	{	// ページ移動ボタンが押されたらゲームのデータを送信
+
+		document.getElementById("gameName").value = "15Puzzle";
+		document.getElementById("gameScore").value = points;
+		document.getElementById("url").value = url;
+		document.querySelector("form").submit();
+
+	}	// submit func end
 }	/* EOF */
