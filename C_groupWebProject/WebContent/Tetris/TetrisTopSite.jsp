@@ -25,7 +25,7 @@
 <div class="level">
 	<a href="TetrisEasyGameSite.html" class="btn">初級</a>
 	<a href="TetrisNormalGameSite.html" class="btn">中級</a>
-	<a href="Tetris/TetrisHardGameSite.html" class="btn">上級</a>
+	<a href="TetrisHardGameSite.html" class="btn">上級</a>
 </div>
 
 
