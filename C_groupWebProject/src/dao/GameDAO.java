@@ -30,7 +30,7 @@ public class GameDAO extends ConstantDefinition{
 		//データベース接続
 		try(Connection con = DriverManager.getConnection(GAME_URL,DRIVER_USER,DRIVER_PASS)){
 
-			// DBにプレイ結果を保存
+			// DBにアカウントを登録する
 			String sqladd =
 				"INSERT INTO gamerecord VALUES('"+ account.getName() +"', '"+data.getGame() +"', '"+ data.getYear() + "', '"+ data.getMonth() + "', '"+ data.getDay() + "', '"+ data.getHour() + "', '"+ data.getMinute() + "', '"+ data.getSecond() + "', '"+ data.getScore() + "')";
 			PreparedStatement pStmt2 = con.prepareStatement(sqladd);

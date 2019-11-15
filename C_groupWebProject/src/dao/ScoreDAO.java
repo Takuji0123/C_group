@@ -40,40 +40,36 @@ extends ConstantDefinition
 		//データベース接続
 		try(Connection con = DriverManager.getConnection(ACCOUNT_URL,DRIVER_USER,DRIVER_PASS)){
 
-//			//TODO VIEWの準備
-//			String viewSQL = "CREATE VIEW ScoreRanking (name, game, score, year, month, day)\n" +
-//					"			AS\n" +
-//					"			SELECT name, game, score, year, month, day	\n" +
-//					"				FROM GameRecord";
-//
-//			//TODO VIEWの実行 (セレクト文を呼び出し、scoreBeans(リスト)へ保存)
-//			ResultSet list = stateVIEW.executeQuery();
-
-
 			//SELECT文の準備
-			String selectSQL = "SELECT name, game, MAX(score) AS maxScore\n" +
-					"FROM ScoreRanking\n" +
-					"GROUP BY name, game";
-
-			//TODO SELECT文の作成
+			String selectSQL = "SELECT * FROM RankView WHERE rank = 1 AND game = '"+ game +"'";
 			PreparedStatement stateSELECT = con.prepareStatement(selectSQL);
 
 			//SELECTを実行
 			ResultSet list = stateSELECT.executeQuery();
 
+			int index = -1;
+
 			while(list.next())
 			{	// SELECT文の結果をArrayListに格納
+
+				// dateのフォーマットを作成
+				String date = list.getString("year") +"/"+ list.getString("month") +"/"+ list.getString("day");
+
+				if (index != -1)
+				{
+					if (scoreList.get(index).getName().equals(list.getString("name")))
+					{ continue; }
+				}	// if end
+
+				//Beansへセットする
 				ScoreBeans var = new ScoreBeans();
-
-				String date = list.getString("YEAR") +"/"+ list.getString("MONTH") +"/"+ list.getString("DAY");
-
-				//TODO Beansへセットする
-				var.setName(list.getString("NAME"));
-				var.setGame(list.getString("GAME"));
-				var.setScore(list.getString("SCORE"));
+				var.setName(list.getString("name"));
+				var.setGame(list.getString("game"));
+				var.setScore(list.getString("score"));
 				var.setDate(date);
-
 				scoreList.add(var);
+
+				index++ ;
 
 			}	// while end
 

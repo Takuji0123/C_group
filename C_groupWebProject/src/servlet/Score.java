@@ -1,13 +1,18 @@
 package servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import logic.ScoreLogic;
 import model.ScoreBeans;
@@ -33,10 +38,53 @@ extends HttpServlet
 			throws ServletException, IOException
 	{
 
-		ScoreLogic logic = new ScoreLogic();
-		List<ScoreBeans> scoreList = logic.rankingLogic((String) request.getAttribute("gameName"));
+		try
+		{
 
-        request.setAttribute("scoreList", scoreList);
+			ScoreLogic logic = new ScoreLogic();
+			List<ScoreBeans> scoreList = logic.rankingLogic(request.getParameter("gameName"));
+
+			//出力(レスポンスをmapに格納してJSON化)
+
+			//JSONマップ
+			Map<String, String> mapMsg = new HashMap<>();
+
+			//追加
+			for (int index = 0 ; index < scoreList.size() ; index++)
+			{	// scoreListをマップへ挿入
+
+				String name = "name"+ index;
+				String score = "score"+ index;
+				String date = "date"+ index;
+
+				mapMsg.put(name, scoreList.get(index).getName());
+				mapMsg.put(score, scoreList.get(index).getScore());
+				mapMsg.put(date, scoreList.get(index).getDate());
+
+			}	// for end
+
+			mapMsg.put("LIST_RENGTH", Integer.toString(scoreList.size()));
+
+			//マッパ(JSON <-> Map, List)
+			ObjectMapper mapper = new ObjectMapper();
+
+			//json文字列
+			String jsonStr = mapper.writeValueAsString(mapMsg);
+
+			//ヘッダ設定
+			response.setContentType("application/json;charset=UTF-8");
+
+			//pwオブジェクト
+			PrintWriter pw = response.getWriter();
+
+			//出力
+			pw.print(jsonStr);
+
+			//クローズ
+			pw.close();
+
+		} catch(Exception e)
+		{ e.printStackTrace(); }
 
 	}
 }

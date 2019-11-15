@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"
-    import="model.ScoreBeans, logic.ScoreLogic, java.util.List"%>
-    <% ScoreLogic logic = new ScoreLogic(); %>
+    import="model.AccountBeans" %>
+    <% AccountBeans account = (AccountBeans) session.getAttribute("accountBeans"); %>
 <!DOCTYPE html>
 <html>
 
@@ -19,8 +19,8 @@
 		<li class="tab">DustBoxGame</li>
 		<li class="tab">15Puzzle</li>
 		<li class="tab">StopWatch</li>
-		<li class="tab">Tetris</li>
-		<li class="tab">N/A</li>
+		<li class="tab">Tetrish</li>
+		<li class="tab">Slot</li>
 	</ul>
 
 	<!-- ランキングリスト（20位まで表示可） -->
@@ -37,12 +37,18 @@
 -->
 	</div>
 
-	<form style="visibility: hidden;" action="/C_groupWebProject/Score" method="get" onsubmit="return false;">
-		<input type="text" name="game" id="gameName">
-	</form>
-
+	<%
+	String name = null;
+	if (account != null)
+	{ name = account.getName(); }
+	%>
+	<script src="/C_groupWebProject/jquery-3.4.1.min.js"></script>
 	<script>
 	(function() {
+
+		<%-- TODO スクリプトのgameをメソッドの引数として渡したい
+		<% List<ScoreBeans> scoreList = logic.rankingLogic("test"); %> --%>
+		let scoreList;
 
 		document.addEventListener('DOMContentLoaded', function() {
 
@@ -60,28 +66,55 @@
 					{ activeTAG[0].classList.remove('is-active'); }
 					this.classList.add('is-active');
 
-					// ランキングを表示させる関数を実行
-					resetList();
-					getRanking(this);
+					//サーバに送信するリクエストの設定
+					$.ajax({
+						type:'GET',
+						url: '/C_groupWebProject/Score',
+						data: {gameName: this.textContent},
+						async: true,
+						dataType: 'json',
+						success : function(data) {
+							//通信が成功したらデータを挿入
+							let size = data["LIST_RENGTH"];
+							scoreList = new Array(size);
 
+							for (let index = 0 ; index < size ; index++)
+							{
+								var name = "name"+ index,
+									score = "score"+ index,
+									date = "date"+ index;
+
+								var bean = {
+										name: data[name],
+										score: data[score],
+										date: data[date]
+								};
+
+								scoreList[index] = bean;
+
+							}	// for end
+
+							// ランキングを表示させる関数を実行
+							resetList();
+							getRanking();
+						},
+						error : function(XMLHttpRequest, textStatus, errorThrown) {
+							alert("リクエスト時になんらかのエラーが発生しました：" + textStatus +":\n" + errorThrown);
+						}
+					});
 				}, false);
 
 			}	// for end
-		});
+		}, false);
 
 
 
-		function getRanking(node)
+		function getRanking()
 		{	// ランキングを取得して表示する
 
-			<%-- TODO スクリプトのgameをメソッドの引数として渡したい
-			let game = node.textContent;
-			<% List<ScoreBeans> scoreList = logic.rankingLogic(game); %>
- 			--%>
- 			document.getElementById("gameName").value = node.textContent;
- 			document.querySelector("form").submit();
 
 			let rankingList = document.getElementById("rankingList");
+			let count = 0;
 
 			for (let index = 0 ; index < 20 ; index++)
 			{	// 20位から順にノードを作成
@@ -106,12 +139,28 @@
 				try
 				{
 
-					<%-- TODO スクリプトのindexをインデックスとして渡したい
-					nameNode.textContent = <%= scoreList[index].getName() %>;
-					scoreNode.innerHTML = '<font size="5">'+ <%= scoreList[index].getScore() %> + '</font>pt';
-					dateNode.textContent = <%= scoreList[index].getDate() %>;
- 					--%>
- 					throw new Error(); // とりあえずキャッチさせておく
+					nameNode.textContent = scoreList[index].name;
+					scoreNode.innerHTML = '<font size="5">'+ scoreList[index].score + '</font>pt';
+					dateNode.textContent = scoreList[index].date;
+
+					if (index != 0)
+					{	// 2位以降で行う処理
+
+						if (scoreList[index].score == scoreList[index - 1].score)
+						{	// 上位者と同ポイントなら同順にする
+
+							// 順位の表示を再設定
+							rankNode.textContent = (index - count) +"位：";
+							count++ ;
+
+						}
+						else
+						{ count = 0; }
+					}	// if end
+
+					// ランキングの名前がログイン中ユーザと一致すればハイライト
+					if (scoreList[index].name == '<%= name %>')
+					{ listNode.style = "color: #F30;"; }
 
 				} catch (error)
 				{	// リストが無ければ以下の表示
@@ -128,10 +177,6 @@
 				listNode.appendChild(nameNode);
 				listNode.appendChild(scoreNode);
 				listNode.appendChild(dateNode);
-
-				// アニメーションのために0.25秒のウェイト
-				/* var startMsec = new Date();
-				while (new Date() - startMsec < 250); */
 
 			}	// for end
 		}	// getRanking func end

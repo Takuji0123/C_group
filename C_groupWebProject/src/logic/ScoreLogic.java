@@ -1,6 +1,8 @@
 package logic;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import dao.ScoreDAO;
@@ -29,21 +31,35 @@ public class ScoreLogic
 	public List<ScoreBeans> rankingLogic(String game)
 	{
 
-		//TODO とりあえずインスタンス生成して呼び出して返すだけ
-		//ScoreDAO inst = new ScoreDAO();
-		//return inst.getRankingList(game);
+		ScoreDAO inst = new ScoreDAO();
+		List<ScoreBeans> scoreList = new LinkedList<>();
+		scoreList = inst.getRankingList(game);
 
-		//TODO チェック用のBeansを返す
-		List<ScoreBeans> scoreList = new ArrayList<>();
-		ScoreBeans bean = new ScoreBeans();
-		bean.setName("TEST");
-		bean.setGame("GAMENAME");
-		bean.setScore("9999");
-		bean.setDate("9999/99/99");
-		scoreList.add(bean);
+		// リストをスコアの降順に並べ換える
+		Collections.sort(scoreList, new Comparator<ScoreBeans>() {
+			@SuppressWarnings("unused")
+			public static final int ASC = 1;   //昇順 (1.2.3....)
+			public static final int DESC = -1; //降順 (3.2.1....)
+
+			@Override
+			public int compare(ScoreBeans value1, ScoreBeans value2)
+			{
+				int sortType = DESC;
+				if (value1 == null && value2 == null)
+				{ return 0; }
+				else if (value1 == null)
+				{ return 1 * sortType; }
+				else if (value2 == null)
+				{ return -1 * sortType; }
+
+				int score1 = Integer.parseInt(value1.getScore());
+				int score2 = Integer.parseInt(value2.getScore());
+
+				return (score1 - score2) * sortType;
+			}
+		});
 
 		return scoreList;
-
 
 	}	// rankingLogic method end
 
